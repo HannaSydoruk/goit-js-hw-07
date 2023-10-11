@@ -24,7 +24,7 @@ function createImageGallery(galleryItems) {
 
 createImageGallery(galleryItems);
 
-const links = document.querySelectorAll('.gallery__link');
+const links = document.querySelectorAll('.gallery__image');
 
 links.forEach(link => {
     link.addEventListener('click', (ev) => ev.preventDefault());
@@ -46,15 +46,20 @@ function onGaleryClick(ev) {
 
     instance.show();
 
-    document.querySelector('.modal').addEventListener('click', () => {
+    function closeModal() {
         instance.close();
-    });
+        document.querySelector('.modal').removeEventListener('click', closeModal);
+        document.removeEventListener('keydown', keydownHandler);
+    }
 
-    document.addEventListener("keydown", event => {
+    document.querySelector('.modal').addEventListener('click', closeModal);
+
+    function keydownHandler(event) {
         if (event.key === 'Escape') {
-            instance.close();
+            closeModal();
         }
-    });
+    }
 
+    document.addEventListener('keydown', keydownHandler);
 }
 
