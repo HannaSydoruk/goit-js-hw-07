@@ -24,42 +24,43 @@ function createImageGallery(galleryItems) {
 
 createImageGallery(galleryItems);
 
-const links = document.querySelectorAll('.gallery__image');
-
-links.forEach(link => {
-    link.addEventListener('click', (ev) => ev.preventDefault());
-});
-
 galleryUl.addEventListener('click', onGaleryClick);
 
 function onGaleryClick(ev) {
 
+    ev.preventDefault();
+
     if (!ev.target.classList.contains('gallery__image')) {
         return;
     }
+
     const originalUrl = ev.target.dataset.source;
-    const instance = basicLightbox.create(`
+    const instance = basicLightbox.create(
+        `
         <div class="modal">
         <img src="${originalUrl}" width="900" height="700" />
         </div>
-    `)
+    `,
+        {
+            onShow: () => {
+                window.addEventListener("keydown", keydownHandler);
+            },
+            onClose: () => {
+                window.removeEventListener("keydown", keydownHandler);
+            }
+        }
+    )
 
     instance.show();
 
-    function closeModal() {
-        instance.close();
-        document.querySelector('.modal').removeEventListener('click', closeModal);
-        document.removeEventListener('keydown', keydownHandler);
-    }
-
-    document.querySelector('.modal').addEventListener('click', closeModal);
-
     function keydownHandler(event) {
         if (event.key === 'Escape') {
-            closeModal();
+            instance.close();
         }
     }
 
-    document.addEventListener('keydown', keydownHandler);
+    // Данний код був потрібен для закривання модального вікна по кліку на картинці всередині модалки
+    // елемент з селектором .modal з"являється тільки після відкриття модалки, тому його не можна було винести за межі функції
+    // const modalElement = document.querySelector('.modal');
+    // modalElement.addEventListener('click', () => { instance.close(); })
 }
-
